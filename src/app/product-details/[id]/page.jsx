@@ -6,27 +6,38 @@ import Footer from "@/component/footer/footer";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 
-async function getData(iddd) {
-  const res = await fetch(`http://localhost:4000/products/${iddd}`);
-  // The return value is *not* serialized
-  // You can return Date, Map, Set, etc.
+async function getData(id) {
+  try {
+    const res = await fetch(
+      `https://prdmgidslzpnltyozjiv.supabase.co/storage/v1/object/sign/jsonfile/db.json?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJqc29uZmlsZS9kYi5qc29uIiwiaWF0IjoxNzIyMDA3ODA3LCJleHAiOjE3NTM1NDM4MDd9.24cxLbDnOjNEAzGqzgbHXvE2rpblD-IbtI_7a8RS7NM&t=2024-07-26T16%3A28%3A27.131Z`
+    );
 
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
+    if (!res.ok) {
+      notFound();
+    }
+
+    const data = await res.json();
+    return data.find((item) => item.id === id) || null;
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
     notFound();
   }
-
-  return res.json();
 }
+
 export async function generateMetadata({ params }) {
   const objData = await getData(params.id);
   return {
-    title: objData.title,
-    description: objData.description,
+    title: objData?.title || "Product not found",
+    description: objData?.description || "No description available",
   };
 }
+
 const Page = async ({ params }) => {
   const objData = await getData(params.id);
+
+  if (!objData) {
+    return <div>Product not found</div>;
+  }
 
   return (
     <div
@@ -45,14 +56,15 @@ const Page = async ({ params }) => {
           flexDirection: "column",
           alignContent: "center",
           justifyContent: "center",
+          padding: "30px",
         }}
         className="flex"
       >
         <Image
-          alt=""
+          alt={objData.title}
           width={1000}
           height={300}
-          src={`/${objData.productImg}`}
+          src={objData.productImg}
           quality={100}
         />
         <div className="product-details">

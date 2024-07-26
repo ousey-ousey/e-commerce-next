@@ -8,9 +8,12 @@ import Image from "next/image";
 
 async function getData() {
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  const res = await fetch("http://localhost:4000/products", {
-    next: { revalidate: 0 },
-  });
+  const res = await fetch(
+    "https://prdmgidslzpnltyozjiv.supabase.co/storage/v1/object/sign/jsonfile/db.json?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJqc29uZmlsZS9kYi5qc29uIiwiaWF0IjoxNzIyMDA3ODA3LCJleHAiOjE3NTM1NDM4MDd9.24cxLbDnOjNEAzGqzgbHXvE2rpblD-IbtI_7a8RS7NM&t=2024-07-26T16%3A28%3A27.131Z",
+    {
+      next: { revalidate: 0 },
+    }
+  );
   // The return value is *not* serialized
   // You can return Date, Map, Set, etc.
 
@@ -29,13 +32,9 @@ const Products = async () => {
         return (
           <article title={item.title} key={item.id} className="card">
             <Link href={`/product-details/${item.id}`}>
-              <Image
-                width={266}
-                height={250}
-                src={"/" + item.productImg}
-                alt=""
-              />
+              <Image width={266} height={250} src={item.productImg} alt="" />
             </Link>
+
             <div style={{ width: "266px" }} className="content">
               <h1 className="title">{item.title}...</h1>
               <p className="description" height={300}>
